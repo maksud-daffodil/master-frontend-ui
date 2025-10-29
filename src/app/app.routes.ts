@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {AuthGuard} from "./utility/app.guard";
 import {LoginComponent} from "./login/login.component";
 import {LogoutComponent} from "./logout/logout.component";
 import {BasicFormComponent} from "./form-element/basic-form/basic-form.component";
 import {
   BasicPageFormListComponent
 } from "./form-element/basic-page-form/basic-page-form-list/basic-page-form-list.component";
+import {canActivateAuthRole} from "./utility/app.guard";
 
 export const routes: Routes = [
   {
     path: 'home',
     component: DashboardComponent,
-    canActivate: [AuthGuard],
+    canActivate: [canActivateAuthRole],
   },
   {
     path: '',
@@ -26,17 +26,17 @@ export const routes: Routes = [
   {
     path: 'logout',
     component: LogoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [canActivateAuthRole],
   },
   {
     path: 'basic-form',
     component: BasicFormComponent,
-    canActivate: [AuthGuard],
+    canActivate: [canActivateAuthRole],
   },
   {
     path: 'basic-page-form-list',
     component: BasicPageFormListComponent,
-    canActivate: [AuthGuard],
+    canActivate: [canActivateAuthRole],
   },
 
 ];

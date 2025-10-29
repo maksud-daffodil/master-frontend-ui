@@ -1,24 +1,32 @@
-import { Component } from '@angular/core';
+import {Component, computed, effect, inject} from '@angular/core';
 import {Router} from "@angular/router";
-import {KeycloakService} from "keycloak-angular";
+import Keycloak from "keycloak-js";
 
 @Component({
-  selector: 'app-login',
+  selector: 'diu-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  constructor(public router: Router, private keycloakService: KeycloakService) {
+  private keycloakService = inject(Keycloak);
+
+  authenticated = this.keycloakService.authenticated;
+  realmAccess = this.keycloakService.realmAccess;
+  grantedRoles = computed(() => this.realmAccess?.roles ?? []);
+
+  constructor(
+    public router: Router,
+
+  ) {
     this.checkLogin();
   }
-
-  ngOnInit() {
-
-  }
   checkLogin() {
-    if(this.keycloakService.getUserRoles().length){
-      this.router.navigate(['/home']);
-    }
+    effect(() => {
+      const roles = this.grantedRoles();
+      if (this.authenticated && roles.length > 0) {
+        this.router.navigate(['/home']);
+      }
+    });
   }
   login() {
     this.router.navigate(['/home']);

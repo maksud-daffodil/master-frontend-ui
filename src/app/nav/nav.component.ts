@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {RoleService} from "../utility/role.service";
 import {environment} from "../environment";
-import {KeycloakService} from "keycloak-angular";
 import {CommonModule } from "@angular/common";
 import {RouterModule} from "@angular/router";
+import Keycloak from "keycloak-js";
 
 declare var $: any;
 @Component({
@@ -18,7 +18,7 @@ declare var $: any;
 export class NavComponent implements OnInit{
   constructor(
     private roleService: RoleService,
-    private keycloakService: KeycloakService
+    private keycloakService: Keycloak,
   ) { }
   ngOnInit(): void {
     this.menuCheck();
@@ -27,11 +27,13 @@ export class NavComponent implements OnInit{
     $('#sidebar_menu').metisMenu();
   }
 
-  menuRoleAccess(role: any){
-    return this.roleService.hasRole(role);
+  menuRoleAccess(roles: string[]){
+    return this.roleService.hasRoles(roles);
   }
 
   logout() {
-    this.keycloakService.logout(environment.sso_logout_url);
+    this.keycloakService.logout({
+      redirectUri: environment.sso_logout_url
+    });
   }
 }

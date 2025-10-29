@@ -39,7 +39,7 @@ export class BasicFormComponent {
       life: 3000
     });
   }
-  editData(data:any){
+  editData(data: any){
     this.basicForm = data;
     this.isUpdateButton = true;
     this.isSaveButton = false;

@@ -1,111 +1,72 @@
-import { Injectable } from '@angular/core';
+import {inject} from '@angular/core';
 import {
-  ActivatedRouteSnapshot,
+  ActivatedRouteSnapshot, CanActivateFn,
   Router,
-  RouterStateSnapshot,
+  RouterStateSnapshot, UrlTree,
 } from '@angular/router';
-import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
+import {AuthGuardData, createAuthGuard} from 'keycloak-angular';
+import Keycloak from "keycloak-js";
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthGuard extends KeycloakAuthGuard {
-  constructor(
-    protected override readonly router: Router,
-    protected readonly keycloak: KeycloakService
-  ) {
-    super(router, keycloak);
+const isAccessAllowed = async (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot,
+  authData: AuthGuardData,
+): Promise<boolean | UrlTree> => {
+  const router = inject(Router);
+  const keycloak = inject(Keycloak);
+  const { authenticated, grantedRoles } = authData;
+
+  if (!authenticated) {
+    await keycloak.login({
+      redirectUri: window.location.origin + state.url,
+    });
+    return false;
   }
 
-  public async isAccessAllowed(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Promise<boolean> {
-    // Force the user to log in if currently unauthenticated.
-    if (!this.authenticated) {
-      console.log(state.url);
-      await this.keycloak.login({
-        redirectUri: window.location.origin + state.url,
-      });
-    }
+  const userRoles = Object.values(grantedRoles.resourceRoles).flat();
+  const url = state.url;
+  const params = route.params;
+  const hasRole = (role: string) => userRoles.includes(role);
+  if (url === '/institute-list') return hasRole('institute_read');
+  if (url === '/institute-create' || url === `/institute-edit/${params['id']}`)
+    return hasRole('institute_write');
+  if (url === '/campus')
+    return hasRole('campus_read')
+      || hasRole('campus_write')
+      || hasRole('campus_delete');
+  if (url === '/faculty-type')
+    return hasRole('faculty_type_read')
+      || hasRole('faculty_type_write')
+      || hasRole('faculty_type_delete');
+  if (url === '/faculty-list') return hasRole('faculty_read');
+  if (url === '/faculty-create' || url === `/faculty-edit/${params['id']}`)
+    return hasRole('faculty_write');
+  if (url === '/department-type')
+    return hasRole('department_type_read')
+      || hasRole('department_type_write')
+      || hasRole('department_type_delete');
+  if (url === '/department-list') return hasRole('department_read');
+  if (url === '/department-create' || url === `/department-edit/${params['id']}`)
+    return hasRole('department_write');
+  if (url === '/program-type') return hasRole('program_type_read');
+  if (url === '/semester-type') return hasRole('semester_type_read');
+  if (url === '/program-list') return hasRole('program_read');
+  if (url === '/semester-list') return hasRole('semester_read');
+  if (url === '/semester-create' || url === `/semester-edit/${params['id']}`)
+    return hasRole('semester_write');
+  if (url === '/course-type') return hasRole('course_type_read');
 
-    if(state.url === '/institute-list'){
-      return this.roles.indexOf("institute_read") !== -1;
-    }
-    if(state.url === '/institute-create' || state.url === '/institute-edit/'+route.params['id']){
-      return this.roles.indexOf("institute_write") !== -1;
-    }
-    if(state.url === '/campus'){
-      return this.roles.indexOf("campus_read") !== -1;
-    }
-    if(state.url === '/campus'){
-      return this.roles.indexOf("campus_write") !== -1;
-    }
-    if(state.url === '/campus'){
-      return this.roles.indexOf("campus_delete") !== -1;
-    }
-    if(state.url === '/faculty-type'){
-      return this.roles.indexOf("faculty_type_read") !== -1;
-    }
-    if(state.url === '/faculty-type'){
-      return this.roles.indexOf("faculty_type_write") !== -1;
-    }
-    if(state.url === '/faculty-type'){
-      return this.roles.indexOf("faculty_type_delete") !== -1;
-    }
-
-    if(state.url === '/faculty-list'){
-      return this.roles.indexOf("faculty_read") !== -1;
-    }
-    if(state.url === '/faculty-create' || state.url === '/faculty-edit/'+route.params['id']){
-      return this.roles.indexOf("faculty_write") !== -1;
-    }
-
-    if(state.url === '/department-type'){
-      return this.roles.indexOf("department_type_read") !== -1;
-    }
-    if(state.url === '/department-type'){
-      return this.roles.indexOf("department_type_write") !== -1;
-    }
-    if(state.url === '/department-type'){
-      return this.roles.indexOf("department_type_delete") !== -1;
-    }
-    if(state.url === '/department-list'){
-      return this.roles.indexOf("department_read") !== -1;
-    }
-    if(state.url === '/department-create' || state.url === '/department-edit/'+route.params['id']){
-      return this.roles.indexOf("department_write") !== -1;
-    }
-    if(state.url === '/program-type'){
-      return this.roles.indexOf("program_type_read") !== -1;
-    }
-    if(state.url === '/semester-type'){
-      return this.roles.indexOf("semester_type_read") !== -1;
-    }
-    if(state.url === '/program-list'){
-      return this.roles.indexOf("program_read") !== -1;
-    }
-    if(state.url === '/semester-list'){
-      return this.roles.indexOf("semester_read") !== -1;
-    }
-    if(state.url === '/semester-create' || state.url === '/semester-edit/'+route.params['id']){
-      return this.roles.indexOf("semester_write") !== -1;
-    }
-    if(state.url === '/course-type'){
-      return this.roles.indexOf("course_type_read") !== -1;
-    }
-
-
-
-    // Get the roles required from the route.
-    const requiredRoles = route.data['roles'];
-
-    // Allow the user to proceed if no additional roles are required to access the route.
-    if (!(requiredRoles instanceof Array) || requiredRoles.length === 0) {
-      return true;
-    }
-
-    // Allow the user to proceed if all the required roles are present.
-    return requiredRoles.every((role) => this.roles.includes(role));
+  const requiredRoles = route.data['roles'];
+  if (!requiredRoles) {
+    return false;
   }
+
+  const hasRequiredRole = (role: string): boolean =>
+    userRoles.some((roles) => roles.includes(role));
+  if (authenticated && hasRequiredRole(requiredRoles)) {
+    return true;
+  }
+
+  return router.parseUrl('/login');
 }
+export const canActivateAuthRole = createAuthGuard<CanActivateFn>(isAccessAllowed);

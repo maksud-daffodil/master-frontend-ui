@@ -35,7 +35,7 @@
       <ul>
         <li><a routerLink="basic-form" routerLinkActive="active">Basic Form</a></li>
         <li><a routerLink="basic-page-form-list" routerLinkActive="active">Basic Page Form</a></li>
-        <li *ngIf="menuRoleAccess('role')"><a routerLink="batch-list" routerLinkActive="active">Demo Form</a></li>
+        <li *ngIf="menuRoleAccess(['role'])"><a routerLink="batch-list" routerLinkActive="active">Demo Form</a></li>
       </ul>
     </li>
     <li class="">

@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterModule} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {Observable, of} from "rxjs";
-import {Router} from "@angular/router";
-import {KeycloakService} from "keycloak-angular";
 import {NavComponent} from "./nav/nav.component";
 import {HeaderComponent} from "./header/header.component";
 import {FooterComponent} from "./footer/footer.component";
+import Keycloak from "keycloak-js";
+import {KEYCLOAK_EVENT_SIGNAL, KeycloakEventType, ReadyArgs, typeEventArgs} from "keycloak-angular";
 
 @Component({
   selector: 'diu-root',
@@ -22,17 +22,21 @@ import {FooterComponent} from "./footer/footer.component";
 })
 export class AppComponent {
   title = 'master-demo-ui';
-  isLoggedIn$!: Observable<boolean>;
+  authenticated$!: Observable<boolean>;
 
-  constructor(public router: Router, private keycloakService: KeycloakService) {
-    this.authLogin();
-  }
-
-  authLogin() {
-    if (this.keycloakService.getUserRoles().length) {
-      this.isLoggedIn$ = of(true);
-    } else {
-      this.isLoggedIn$ = of(false);
-    }
+  constructor(
+    public router: Router,
+    private keycloakService: Keycloak,
+  ) {
+    const keycloakSignal = inject(KEYCLOAK_EVENT_SIGNAL);
+    effect(() => {
+      const keycloakEvent = keycloakSignal();
+      if (keycloakEvent.type === KeycloakEventType.Ready) {
+        this.authenticated$ = of(typeEventArgs<ReadyArgs>(keycloakEvent.args));
+      }
+      if (keycloakEvent.type === KeycloakEventType.AuthLogout) {
+        this.authenticated$ = of(false);
+      }
+    });
   }
 }
