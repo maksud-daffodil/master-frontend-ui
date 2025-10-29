@@ -1,27 +1,43 @@
 import {Component, ViewChild} from '@angular/core';
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {BasicForm} from "../../model/basicForm";
-import {ToastrService} from "ngx-toastr";
+import { MessageService } from 'primeng/api';
+import {CommonModule} from "@angular/common";
+import { Toast } from 'primeng/toast';
+import {NgOptionComponent, NgSelectComponent} from "@ng-select/ng-select";
 
 @Component({
-  selector: 'app-basic-form',
+  selector: 'diu-basic-form',
   templateUrl: './basic-form.component.html',
-  styleUrls: ['./basic-form.component.css']
+  imports: [
+    CommonModule,
+    FormsModule,
+    Toast,
+    NgSelectComponent,
+    NgOptionComponent,
+  ],
+  styleUrls: ['./basic-form.component.scss']
 })
 export class BasicFormComponent {
   @ViewChild('validationForm') form: NgForm | undefined;
   basicForm = new BasicForm();
-  list:any=[];
+  list: any = [];
   isSaveButton:boolean = true;
   isUpdateButton:boolean = false;
-  constructor(private toastr: ToastrService) {
-  }
+
+  constructor(
+    private messageService: MessageService
+  ) {}
 
   saveData(){
     this.list.push(this.basicForm);
     this.basicForm = new BasicForm();
-    console.log(this.list);
-    this.toastr.success('Success');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Message Content',
+      life: 3000
+    });
   }
   editData(data:any){
     this.basicForm = data;
@@ -35,13 +51,23 @@ export class BasicFormComponent {
   }
   deleteData(data:any){
     this.list = this.list.filter((item: any)  => item !== data);
-    this.toastr.success('Successfully Deleted');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Successfully Deleted',
+      life: 3000
+    });
   }
 
   updateData() {
     this.list.findIndex((item: BasicForm) => item === this.basicForm);
     // this.list[indexToUpdate] = response.data;
-    this.toastr.success('Successfully Updated');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Successfully Updated',
+      life: 3000
+    });
     this.basicForm = new BasicForm();
     this.isUpdateButton = false;
     this.isSaveButton = true;

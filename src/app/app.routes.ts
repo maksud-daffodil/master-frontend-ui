@@ -9,7 +9,7 @@ import {
   BasicPageFormListComponent
 } from "./form-element/basic-page-form/basic-page-form-list/basic-page-form-list.component";
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'home',
     component: DashboardComponent,
@@ -45,4 +45,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutes { }

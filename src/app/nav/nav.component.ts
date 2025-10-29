@@ -1,16 +1,25 @@
 import {Component, OnInit} from '@angular/core';
 import {RoleService} from "../utility/role.service";
-import {environment} from "../../environment/environment";
+import {environment} from "../environment";
 import {KeycloakService} from "keycloak-angular";
+import {CommonModule } from "@angular/common";
+import {RouterModule} from "@angular/router";
+
 declare var $: any;
 @Component({
-  selector: 'app-nav',
+  selector: 'diu-nav',
+  imports: [
+    CommonModule,
+    RouterModule,
+  ],
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+  styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit{
-  constructor(private roleService: RoleService, private keycloakService: KeycloakService) {
-  }
+  constructor(
+    private roleService: RoleService,
+    private keycloakService: KeycloakService
+  ) { }
   ngOnInit(): void {
     this.menuCheck();
   }

@@ -1,0 +1,68 @@
+@import "@ng-select/ng-select/themes/default.theme.css";
+
+:root {
+  --primary-color: #373063;
+  --primary-hover: #373063e6;
+  --accent-color: #0f1a34;
+  --accent-hover: #091023;
+  --background-color: #f9f9f9;
+  --surface-color: #fff;
+  --border-color: var(--primary-color);
+  --text-color: #111827;
+  --text-muted: #6b7280;
+  --outline-color: #bbc1c9;
+  --placeholder-color: #212529;
+  --radius-sm: 0.25rem;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --padding-x: 0.75rem;
+  --padding-y: 0.375rem;
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --transition-fast: 0.2s ease;
+  --transition-slow: 0.8s ease;
+  --font-family: 'merriweather sans', sans-serif;
+  --gap-default: 5px;
+}
+
+input[type="text"],
+[type="email"],
+select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type="submit"] {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.form,
+.form-data {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  width: 400px;
+  margin: 30px auto;
+}
+
+input.ng-invalid.ng-touched {
+  border: red 1px solid;
+}
+small {
+  color: red;
+}

@@ -1,19 +1,22 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {KeycloakService} from "keycloak-angular";
-import {environment} from "../../environment/environment";
+import {environment} from "../environment";
 import {ProfileService} from "../service/profile.service";
 import {Profile} from "../model/profile";
+
 declare var $: any;
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   profile: any = new Profile();
 
-  constructor(private keycloakService: KeycloakService, private service: ProfileService) {
-  }
+  constructor(
+    private keycloakService: KeycloakService,
+    private service: ProfileService
+  ) { }
 
   ngOnInit(): void {
     this.getProfile();
@@ -35,6 +38,4 @@ export class HeaderComponent {
       this.profile = response;
     })
   }
-
-
 }
